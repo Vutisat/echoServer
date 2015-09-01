@@ -25,6 +25,7 @@ public class Server {
 	int port;
 	Log log;
 	ArrayList<SocketAddress> handlers;
+	private Object echoToAll;
 
 	// start server
 	public static void main(String a[]) {
@@ -88,11 +89,12 @@ public class Server {
 					handlers.add(pkt.getSocketAddress());
 					sendMsg(pkt.getSocketAddress(), 0);
 					log.log(pkt.getAddress().toString() + "has connected");
-					
 				} else if (messages[0].equals("MESSAGE")) {
-
+					echoToAll(messages[1]);
 				} else if (messages[0].equals("GOODBYE")) {
-
+					sendMsg(pkt.getSocketAddress(), 1);
+					diconnectAClient(pkt.getSocketAddress());
+					log.log(pkt.getAddress().toString() + "has disconnected");
 				}
 
 			} catch (IOException err) {
@@ -155,5 +157,16 @@ public class Server {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void echoToAll(String messageToEcho){
+		
+	}
+	
+	public void diconnectAClient(SocketAddress sa){
+		for(int i = 0; i <= handlers.size(); i++){
+			if(handlers.get(i).equals(sa))
+				handlers.remove(i);
+		}
 	}
 }
