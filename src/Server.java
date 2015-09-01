@@ -7,9 +7,7 @@
 
    Simple datagram server that says hello and goodbye to clients.
    The server also echo messages to all the connected client when received.
-   Wasn't in the requirement but I went ahead and made a hashmap that keeps a history of who has connected in the past.
-   It was my initial logic and it works, so I didn't see a need to go back and change it. Everything should still fully meet the rubric.
-
+   
  */
 
 import java.net.*;
@@ -26,7 +24,7 @@ public class Server {
 	DatagramPacket pkt;
 	int port;
 	Log log;
-	HashMap<SocketAddress, Boolean> handlers;
+	ArrayList<SocketAddress> handlers;
 
 	// start server
 	public static void main(String a[]) {
@@ -64,9 +62,8 @@ public class Server {
 												// std out
 		log.log("Server Starting");
 
-		// This will keep track of clients connecting in and whether they are
-		// still connected.
-		handlers = new HashMap<SocketAddress, Boolean>();
+		// This will keep track of clients connected.
+		handlers = new ArrayList<SocketAddress>();
 
 		// loop forever
 		while (true) {
@@ -88,7 +85,7 @@ public class Server {
 
 				// Dealing with the packets coming in
 				if (messages[0].equals("HELLO")) {
-					handlers.put(pkt.getSocketAddress(), true);
+					handlers.add(pkt.getSocketAddress());
 					sendMsg(pkt.getSocketAddress(), 0);
 					log.log(pkt.getAddress().toString() + "has connected");
 					
