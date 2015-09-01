@@ -1,10 +1,14 @@
 /*
-   Pob Vutisalchavakul
+ * Framework of a server from Scott Campbell
+   Edited and made serve the purpose by Pob Vutisalchavakul
    CSE383 B
 
    Homework 1
 
-   Simple datagram server
+   Simple datagram server that says hello and goodbye to clients.
+   The server also echo messages to all the connected client when received.
+   Wasn't in the requirement but I went ahead and made a hashmap that keeps a history of who has connected in the past.
+   It was my initial logic and it works, so I didn't see a need to go back and change it. Everything should still fully meet the rubric.
 
  */
 
@@ -15,7 +19,7 @@ import java.io.*;
 
 /**
  * @author Pob
- *
+ * 
  */
 public class Server {
 	DatagramSocket sock;
@@ -85,8 +89,9 @@ public class Server {
 				// Dealing with the packets coming in
 				if (messages[0].equals("HELLO")) {
 					handlers.put(pkt.getSocketAddress(), true);
+					sendMsg(pkt.getSocketAddress(), 0);
 					log.log(pkt.getAddress().toString() + "has connected");
-
+					
 				} else if (messages[0].equals("MESSAGE")) {
 
 				} else if (messages[0].equals("GOODBYE")) {
@@ -140,16 +145,18 @@ public class Server {
 			} else {
 				System.out.println("incorrect use of sending messages.");
 			}
-			//Making the packet to send
+			// Making the packet to send
 			byte bytesToSend[] = bos.toByteArray();
-			DatagramPacket responsePacket = new DatagramPacket(bytesToSend, bytesToSend.length, sa);
-			
-			//Sending the packet
+			DatagramPacket responsePacket = new DatagramPacket(bytesToSend,
+					bytesToSend.length, sa);
+
+			// Sending the packet
 			sock.send(responsePacket);
 		} catch (IOException e) {
-			log.log("There was an error responding to client 'hello' or 'goodbye' message: \n" + e);
+			log.log("There was an error responding to client 'hello' or 'goodbye' message: \n"
+					+ e);
 			e.printStackTrace();
 		}
-		
+
 	}
 }
