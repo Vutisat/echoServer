@@ -25,7 +25,8 @@ public class Server {
 	int port;
 	Log log;
 	ArrayList<SocketAddress> handlers;
-	private Object echoToAll;
+	String helloResponse = "HELLO-RESPONSE";
+	String goodbyeResponse = "GOODBYE-RESPONSE";
 
 	// start server
 	public static void main(String a[]) {
@@ -87,14 +88,17 @@ public class Server {
 				// Dealing with the packets coming in
 				if (messages[0].equals("HELLO")) {
 					handlers.add(pkt.getSocketAddress());
-					sendMsg(pkt.getSocketAddress(), 0);
+					sendMsg(pkt.getSocketAddress(), helloResponse);
 					log.log(pkt.getAddress().toString() + "has connected");
 				} else if (messages[0].equals("MESSAGE")) {
 					echoToAll(messages[1]);
 				} else if (messages[0].equals("GOODBYE")) {
-					sendMsg(pkt.getSocketAddress(), 1);
+					sendMsg(pkt.getSocketAddress(), goodbyeResponse);
 					diconnectAClient(pkt.getSocketAddress());
 					log.log(pkt.getAddress().toString() + "has disconnected");
+				} else{
+					log.log("Invalid message command was received");
+					sendMsg(pkt.getSocketAddress(), "Invalid command was received, please try again following the protocol");
 				}
 
 			} catch (IOException err) {
@@ -132,18 +136,11 @@ public class Server {
 	 *            this int indicates what type of message will be sent. 0 means
 	 *            a hello response, where 1 means a goodbye response.
 	 */
-	public void sendMsg(SocketAddress sa, int messageType) {
+	public void sendMsg(SocketAddress sa, String messageType) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		try {
-			if (messageType == 0) {
-				dos.writeUTF("HELLO-RESPONSE");
-			} else if (messageType == 1) {
-
-				dos.writeUTF("GOODBYE-RESPONSE");
-			} else {
-				System.out.println("incorrect use of sending messages.");
-			}
+			dos.writeUTF(messageType);
 			// Making the packet to send
 			byte bytesToSend[] = bos.toByteArray();
 			DatagramPacket responsePacket = new DatagramPacket(bytesToSend,
@@ -152,15 +149,16 @@ public class Server {
 			// Sending the packet
 			sock.send(responsePacket);
 		} catch (IOException e) {
-			log.log("There was an error responding to client 'hello' or 'goodbye' message: \n"
+			log.log("There was an error responding to client senging a message back to clients message: \n"
 					+ e);
-			e.printStackTrace();
 		}
 
 	}
 	
 	public void echoToAll(String messageToEcho){
-		
+		for(int i = 0; i <= handlers.size(); i++){
+			sendMsg(handlers.get(i), messageToEcho);
+		}
 	}
 	
 	public void diconnectAClient(SocketAddress sa){
