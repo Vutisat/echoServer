@@ -10,6 +10,7 @@
    
  */
 
+package vutisat;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,13 +90,14 @@ public class Server {
 				if (messages[0].equals("HELLO")) {
 					handlers.add(pkt.getSocketAddress());
 					sendMsg(pkt.getSocketAddress(), helloResponse);
-					log.log(pkt.getAddress().toString() + "has connected");
+					log.log(pkt.getAddress() + " has connected");
 				} else if (messages[0].equals("MESSAGE")) {
 					echoToAll(messages[1]);
+					log.log("Going to echo a message that says: " + messages[1]);
 				} else if (messages[0].equals("GOODBYE")) {
 					sendMsg(pkt.getSocketAddress(), goodbyeResponse);
 					diconnectAClient(pkt.getSocketAddress());
-					log.log(pkt.getAddress().toString() + "has disconnected");
+					log.log(pkt.getAddress().toString() + " has disconnected");
 				} else{
 					log.log("Invalid message command was received");
 					sendMsg(pkt.getSocketAddress(), "Invalid command was received, please try again following the protocol");
@@ -120,9 +122,9 @@ public class Server {
 		try {
 			msgArr[0] = dis.readUTF();
 			msgArr[1] = dis.readUTF();
+			log.log("The packet received says: " + msgArr[0] + " and " + msgArr[1]);
 		} catch (IOException e) {
 			log.log("Error receiving the message");
-			e.printStackTrace();
 			return null;
 		}
 
@@ -156,13 +158,14 @@ public class Server {
 	}
 	
 	public void echoToAll(String messageToEcho){
-		for(int i = 0; i <= handlers.size(); i++){
+		for(int i = 0; i < handlers.size(); i++){
+			log.log("Sending message to: " + handlers.get(i));
 			sendMsg(handlers.get(i), messageToEcho);
 		}
 	}
 	
 	public void diconnectAClient(SocketAddress sa){
-		for(int i = 0; i <= handlers.size(); i++){
+		for(int i = 0; i < handlers.size(); i++){
 			if(handlers.get(i).equals(sa))
 				handlers.remove(i);
 		}

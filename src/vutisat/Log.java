@@ -8,6 +8,7 @@ Create log
 
 */
 
+package vutisat;
 import java.io.*;
 import java.util.Date;
 import java.text.DateFormat;

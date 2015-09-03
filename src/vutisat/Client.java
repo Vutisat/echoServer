@@ -7,6 +7,7 @@
 
    run this by java campbest.client localhost 4000 for example
  */
+package vutisat;
 import java.net.*;
 import java.io.*;
 
